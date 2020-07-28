@@ -15,12 +15,12 @@ type Task struct {
 	Done  bool   // Is this task done?
 }
 
-func (task *Task) toTodo() TaskDao.Todo {
+func (task *Task) toTodo() *TaskDao.Todo {
 	todo := TaskDao.Todo{}
 	todo.Name = task.Title
 	todo.Done = task.Done
 	todo.Id = int(task.ID)
-	return todo
+	return &todo
 }
 
 // NewTask creates a new task given a title, that can't be empty.
@@ -48,8 +48,9 @@ func (m *TaskManager) Save(task *Task) error {
 	if task.ID == 0 {
 		m.lastID++
 		task.ID = m.lastID
-		m.tasks = append(m.tasks, cloneTask(task))
-		dao.Create(&m.tasks[m.lastID])
+		var clonedTask = cloneTask(task)
+		m.tasks = append(m.tasks, clonedTask)
+		dao.Create(clonedTask.toTodo())
 		return nil
 	}
 

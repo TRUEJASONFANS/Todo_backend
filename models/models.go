@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/orm"
 )
 
 type User struct {
@@ -34,5 +33,5 @@ type Tag struct {
 func init() {
 	// 需要在init中注册定义的model
 	fmt.Println("init the User models")
-	orm.RegisterModel(new(User), new(Post), new(Profile), new(Tag))
+	//orm.RegisterModel(new(User), new(Post), new(Profile), new(Tag))
 }

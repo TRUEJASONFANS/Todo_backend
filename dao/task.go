@@ -15,8 +15,7 @@ type Todo struct {
 
 
 func init() {
-	fmt.Println("init the task dao")
-	orm.RegisterModel(new(Todo))
+
 }
 
 var instance *TodoDAO
