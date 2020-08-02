@@ -3,10 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"strconv"
+	TaskDao "todo_beego/dao"
 	"todo_beego/models"
 
 	"github.com/astaxie/beego"
-
 )
 
 type TaskController struct {
@@ -21,7 +21,7 @@ type TaskController struct {
 //          {"ID": 2, "Title": "Buy bread", "Done": true}
 //        ]}
 func (this *TaskController) ListTasks() {
-	res := struct{ Tasks []*models.Task }{models.DefaultTaskList.All()}
+	res := struct{ Tasks []*TaskDao.Todo }{models.DefaultTaskList.All()}
 	this.Data["json"] = res
 	this.ServeJSON()
 }
@@ -34,13 +34,13 @@ func (this *TaskController) ListTasks() {
 //   req: POST /task/ {"Title": "Buy bread"}
 //   res: 200
 func (this *TaskController) NewTask() {
-	req := struct{ Title string }{}
+	req := struct{ Name string }{}
 	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &req); err != nil {
 		this.Ctx.Output.SetStatus(400)
 		this.Ctx.Output.Body([]byte("empty title"))
 		return
 	}
-	t, err := models.NewTask(req.Title)
+	t, err := models.NewTask(req.Name)
 	if err != nil {
 		this.Ctx.Output.SetStatus(400)
 		this.Ctx.Output.Body([]byte(err.Error()))
@@ -82,7 +82,7 @@ func (this *TaskController) UpdateTask() {
 	id := this.Ctx.Input.Param(":id")
 	beego.Info("Task is ", id)
 	intid, _ := strconv.ParseInt(id, 10, 64)
-	var t models.Task
+	var t TaskDao.Todo
 	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &t); err != nil {
 		this.Ctx.Output.SetStatus(400)
 		this.Ctx.Output.Body([]byte(err.Error()))

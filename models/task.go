@@ -3,37 +3,25 @@ package models
 import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
+
 	TaskDao "todo_beego/dao"
 )
 
 var DefaultTaskList *TaskManager
 var dao = TaskDao.GetInstance()
 
-type Task struct {
-	ID    int64  // Unique identifier
-	Title string // Description
-	Done  bool   // Is this task done?
-}
-
-func (task *Task) toTodo() *TaskDao.Todo {
-	todo := TaskDao.Todo{}
-	todo.Name = task.Title
-	todo.Done = task.Done
-	todo.Id = int(task.ID)
-	return &todo
-}
-
 // NewTask creates a new task given a title, that can't be empty.
-func NewTask(title string) (*Task, error) {
+func NewTask(title string) (*TaskDao.Todo, error) {
 	if title == "" {
 		return nil, fmt.Errorf("empty title")
 	}
-	return &Task{0, title, false}, nil
+	return &TaskDao.Todo{ID: 0, Name: title, Done: false, DateTime: time.Now().Unix()}, nil
 }
 
 // TaskManager manages a list of tasks in memory.
 type TaskManager struct {
-	tasks  []*Task
+	tasks  []*TaskDao.Todo
 	lastID int64
 }
 
@@ -43,20 +31,21 @@ func NewTaskManager() *TaskManager {
 }
 
 // Save saves the given Task in the TaskManager.
-func (m *TaskManager) Save(task *Task) error {
+func (m *TaskManager) Save(task *TaskDao.Todo) error {
 
 	if task.ID == 0 {
 		m.lastID++
 		task.ID = m.lastID
 		var clonedTask = cloneTask(task)
 		m.tasks = append(m.tasks, clonedTask)
-		dao.Create(clonedTask.toTodo())
+		dao.Create(clonedTask)
 		return nil
 	}
 
 	for i, t := range m.tasks {
 		if t.ID == task.ID {
 			m.tasks[i] = cloneTask(task)
+			dao.Update(m.tasks[i])
 			return nil
 		}
 	}
@@ -64,19 +53,19 @@ func (m *TaskManager) Save(task *Task) error {
 }
 
 // cloneTask creates and returns a deep copy of the given Task.
-func cloneTask(t *Task) *Task {
+func cloneTask(t *TaskDao.Todo) *TaskDao.Todo {
 	c := *t
 	return &c
 }
 
 // All returns the list of all the Tasks in the TaskManager.
-func (m *TaskManager) All() []*Task {
+func (m *TaskManager) All() []*TaskDao.Todo {
 	return m.tasks
 }
 
 // Find returns the Task with the given id in the TaskManager and a boolean
 // indicating if the id was found.
-func (m *TaskManager) Find(ID int64) (*Task, bool) {
+func (m *TaskManager) Find(ID int64) (*TaskDao.Todo, bool) {
 	for _, t := range m.tasks {
 		if t.ID == ID {
 			return t, true
@@ -87,5 +76,10 @@ func (m *TaskManager) Find(ID int64) (*Task, bool) {
 
 func init() {
 	DefaultTaskList = NewTaskManager()
-
+	m := DefaultTaskList
+	todoList := TaskDao.GetInstance().ListAll()
+	m.tasks = make([]*TaskDao.Todo, 0)
+	for i, _ := range todoList {
+		m.tasks = append(m.tasks, &todoList[i])
+	}
 }

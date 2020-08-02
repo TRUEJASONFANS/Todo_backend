@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"github.com/astaxie/beego/orm"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
@@ -17,7 +18,7 @@ func init() {
 	// 数据库别名
 	name := "default"
 
-	force := true
+	force := false
 
 	// 打印执行过程
 	verbose := true
@@ -29,5 +30,4 @@ func init() {
 }
 
 type BaseDAO struct {
-
 }

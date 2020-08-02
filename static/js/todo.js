@@ -21,7 +21,7 @@ function TaskCtrl($scope, $http) {
 
   $scope.addTodo = function() {
     $scope.working = true;
-    $http.post('/task/', {Title: $scope.todoText}).
+    $http.post('/task/', {Name: $scope.todoText}).
       error(logError).
       success(function() {
         refresh().then(function() {
@@ -32,7 +32,7 @@ function TaskCtrl($scope, $http) {
   };
 
   $scope.toggleDone = function(task) {
-    data = {ID: task.ID, Title: task.Title, Done: !task.Done}
+    data = {ID: task.ID, Name: task.Name, Done: !task.Done}
     $http.put('/task/'+task.ID, data).
       error(logError).
       success(function() { task.Done = !task.Done });

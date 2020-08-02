@@ -6,13 +6,11 @@ import (
 )
 
 type Todo struct {
-	Id          int
-	Name        string
-	Done  bool
-	dateTime  int64
+	ID       int64
+	Name     string
+	Done     bool
+	DateTime int64
 }
-
-
 
 func init() {
 
@@ -26,7 +24,7 @@ type TodoDAO struct {
 
 func (dao Todo) Read(todoId int) {
 	o := orm.NewOrm()
-	user := Todo{Id: todoId}
+	user := Todo{ID: int64(todoId)}
 
 	err := o.Read(&user)
 
@@ -35,8 +33,18 @@ func (dao Todo) Read(todoId int) {
 	} else if err == orm.ErrMissPK {
 		fmt.Println("找不到主键")
 	} else {
-		fmt.Println(user.Id, user.Name)
+		fmt.Println(user.ID, user.Name)
 	}
+}
+
+func (dao TodoDAO) ListAll() []Todo {
+	o := orm.NewOrm()
+	var todoList []Todo
+	num, error := o.Raw("select * from todo").QueryRows(&todoList)
+	if error == nil {
+		fmt.Println("todo nums: ", num)
+	}
+	return todoList
 }
 
 func (dao TodoDAO) Create(todo *Todo) {
@@ -49,8 +57,9 @@ func (dao TodoDAO) Create(todo *Todo) {
 
 func (dao TodoDAO) Update(todo *Todo) int64 {
 	o := orm.NewOrm()
-	if o.Read(&todo) == nil {
-		if num, err := o.Update(&todo); err == nil {
+	temp := *todo
+	if o.Read(&temp) == nil {
+		if num, err := o.Update(todo); err == nil {
 			fmt.Println(num)
 			return num
 		}
@@ -70,7 +79,7 @@ func (dao TodoDAO) Delete(todo *Todo) int64 {
 
 func GetInstance() *TodoDAO {
 	if instance == nil {
-		instance = &TodoDAO {}
+		instance = &TodoDAO{}
 	}
 	return instance
 }
