@@ -74,6 +74,21 @@ func (m *TaskManager) Find(ID int64) (*TaskDao.Todo, bool) {
 	return nil, false
 }
 
+func (m *TaskManager) Delete(id int64) error {
+	var idToRemoved = -1
+	for index, t := range m.tasks {
+		if t.ID == id {
+			idToRemoved = index
+			dao.Delete(id)
+		}
+	}
+	if idToRemoved != -1 {
+		m.tasks = append(m.tasks[:idToRemoved], m.tasks[idToRemoved+1:]...)
+	}
+	return nil
+
+}
+
 func init() {
 	DefaultTaskList = NewTaskManager()
 	m := DefaultTaskList
