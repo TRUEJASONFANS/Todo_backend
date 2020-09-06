@@ -15,5 +15,10 @@
 # vendor/
 
 .idea/
+todo_dist/*
+todo_dist/conf
+todo_dist/static
+todo_dist/views
+
 
 todo_beego

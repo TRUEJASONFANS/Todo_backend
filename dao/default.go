@@ -8,7 +8,7 @@ import (
 
 func init() {
 	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase("default", "mysql", "root:1234@tcp(127.0.0.1:3306)/todos_db?charset=utf8")
+	orm.RegisterDataBase("default", "mysql", "root:@tcp(127.0.0.1:3306)/todos_db?charset=utf8")
 	fmt.Println("loading the database driver")
 	fmt.Println("init the task dao")
 	orm.RegisterModel(new(Todo))
