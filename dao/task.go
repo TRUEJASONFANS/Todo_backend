@@ -69,7 +69,7 @@ func (dao TodoDAO) Update(todo *Todo) int64 {
 
 func (dao TodoDAO) Delete(id int64) int64 {
 	o := orm.NewOrm()
-	if num, err := o.Delete(id); err == nil {
+	if num, err := o.Delete(&Todo{ID: id}); err == nil {
 		return num
 	} else {
 		fmt.Println(err)

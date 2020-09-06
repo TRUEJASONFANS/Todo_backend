@@ -37,7 +37,7 @@ func (task *TaskController) NewTask() {
 	req := struct{ Name string }{}
 	if err := json.Unmarshal(task.Ctx.Input.RequestBody, &req); err != nil {
 		task.Ctx.Output.SetStatus(400)
-		task.Ctx.Output.Body([]byte("empty title"))
+		task.Ctx.Output.Body([]byte("empty Name"))
 		return
 	}
 	t, err := models.NewTask(req.Name)
@@ -47,6 +47,8 @@ func (task *TaskController) NewTask() {
 		return
 	}
 	models.DefaultTaskList.Save(t)
+	task.Data["json"] = &t
+	task.ServeJSON()
 }
 
 // Examples:
@@ -99,6 +101,9 @@ func (task *TaskController) UpdateTask() {
 		return
 	}
 	models.DefaultTaskList.Save(&t)
+	res := struct{ task TaskDao.Todo }{t}
+	task.Data["json"] = res
+	task.ServeJSON()
 }
 
 func (task *TaskController) DeleteTask() {
